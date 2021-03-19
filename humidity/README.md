@@ -1,0 +1,21 @@
+# ATMega328P
+
+Yay!
+
+# FTDI232
+
+DTR
+RX
+TX
+VCC
+CTS
+GND
+
+# Adafruit one
+
+RTS
+RX
+TX
+VCC
+CTS
+GND

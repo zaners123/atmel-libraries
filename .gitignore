@@ -1,0 +1,13 @@
+# Folders
+.idea/
+tiny/BasicSerial/
+tiny/arduino/
+
+# Filetypes
+.elf
+.hex
+.html
+.pdf
+.png
+.o
+
