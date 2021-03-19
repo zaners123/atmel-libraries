@@ -4,10 +4,10 @@ tiny/BasicSerial/
 tiny/arduino/
 
 # Filetypes
-.elf
-.hex
-.html
-.pdf
-.png
-.o
+*.elf
+*.hex
+*.html
+*.pdf
+*.png
+*.o
 
