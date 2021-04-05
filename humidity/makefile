@@ -3,10 +3,11 @@ FILENAME   = main
 FILEA = main.cpp
 
 PORT       = /dev/ttyACM0
-DEVICE     = attiny85
+DEVICE     = attiny4313
 PROGRAMMER = arduino
 BAUD       = 19200
-COMPILE    = avr-g++ -Wall -Os -I arduino/avr/libraries/SoftwareSerial/src -I arduino -I arduino/avr/libraries -I arduino/avr/cores/arduino -mmcu=$(DEVICE)
+ # COMPILE    = avr-g++ -Wall -Os -I arduino/avr/libraries/SoftwareSerial/src -I arduino -I arduino/avr/libraries -I arduino/avr/cores/arduino -mmcu=$(DEVICE)
+COMPILE    = avr-g++ -Wall -Os -mmcu=$(DEVICE)
 
 default: compile upload clean
 all: compile

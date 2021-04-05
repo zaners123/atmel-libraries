@@ -4,7 +4,7 @@
 #include "Stepper.h"
 #include "RTC.h"
 #include "Pins.h"
-#include "UART.h"
+#include "NativeUart.h"
 
 #define SET_DATE false
 #define HOURS_PER_RESET 12L

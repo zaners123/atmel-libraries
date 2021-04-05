@@ -2,7 +2,7 @@
 #define ATMEGA328P_RTC_H
 
 #include "Pins.h"
-#include "UART.h"
+#include "NativeUart.h"
 
 #define BURST_BYTES 8
 
