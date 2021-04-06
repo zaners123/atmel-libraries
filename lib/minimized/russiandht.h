@@ -9,9 +9,9 @@
  */
 #include <avr/io.h>
 
-#define DHT_PORT        PORTB // порт
-#define DHT_DDR         DDRB
-#define DHT_PIN         PINB
+#define DHT_PORT        PORTD // порт
+#define DHT_DDR         DDRD
+#define DHT_PIN         PIND
 
 int dhtread (char bit, int *h, int *t)
 //bit — номер бита порта,
