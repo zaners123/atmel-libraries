@@ -9,6 +9,10 @@ enum PinMode {
 	,INPUT_PULLUP
 };
 enum PortLetter {
+#ifdef DDRA
+	A,
+#endif
+
 	B,
 #ifdef DDRC
 	C,
@@ -39,11 +43,15 @@ public:
 	}
 	Pin(PortLetter portLetter, uint8_t pinNumber) {
 		switch (portLetter) {
+#ifdef DDRA
+			case A:this->ddr=&DDRA;this->port=&PORTA;this->pin=&PINA;break;
+#endif
+#ifdef DDRB
 			case B:this->ddr=&DDRB;this->port=&PORTB;this->pin=&PINB;break;
+#endif
 #ifdef DDRC
 			case C:this->ddr=&DDRC;this->port=&PORTC;this->pin=&PINC;break;
 #endif
-
 #ifdef DDRD
 			case D:this->ddr=&DDRD;this->port=&PORTD;this->pin=&PIND;break;
 #endif

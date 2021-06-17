@@ -9,10 +9,10 @@
    to achieve the desired baud rate (nominal value is 103)
 */
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <util/delay.h>
-#include <stdio.h>
+//#include <avr/io.h>
+//#include <avr/interrupt.h>
+//#include <util/delay.h>
+//#include <stdio.h>
 
 // change these to use another pin
 #define TX_PORT PORTB
@@ -37,14 +37,16 @@ void UART_tx(char character)
 }
 
 void UART_tx_str(const char* string){
+	//until null char
 	while( *string ){
+		//send a char
 		UART_tx( *string++ );
 		//wait until transmission is finished
 		while(tx_shift_reg);
 	}
 }
 
-void UART_tx_int(int number, int radix = 10){
+/*void UART_tx_int(int number, int radix = 10){
 	static char buffer[sizeof(int)*8+1];
 	utoa(number,buffer,radix);
 	UART_tx_str(buffer);
@@ -54,7 +56,7 @@ void UART_tx_ul(unsigned long number, int radix = 10){
 	static char buffer[sizeof(unsigned long int)*8+1];
 	ultoa(number,buffer,radix);
 	UART_tx_str(buffer);
-}
+}*/
 
 void UART_init(){
 	//set TX pin as output
