@@ -6,7 +6,7 @@ PORT       = /dev/ttyACM0
 DEVICE     = attiny4313
 PROGRAMMER = arduino
 BAUD       = 19200
-COMPILE    = avr-g++ -Wall -Os -s -mmcu=$(DEVICE)
+COMPILE    = avr-g++ -Wall -Os -s -fdata-sections -ffunction-sections -mmcu=$(DEVICE) -Wl,--gc-sections
 
 default: compile upload clean
 all: compile

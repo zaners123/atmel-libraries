@@ -46,6 +46,12 @@ void UART_tx_str(const char* string){
 	}
 }
 
+void UART_tx_uint8(uint8_t number, int radix = 10){
+	static char buffer[sizeof(int)*8+1];
+	utoa(number,buffer,radix);
+	UART_tx_str(buffer);
+}
+
 /*void UART_tx_int(int number, int radix = 10){
 	static char buffer[sizeof(int)*8+1];
 	utoa(number,buffer,radix);
