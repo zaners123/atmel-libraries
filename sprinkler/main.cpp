@@ -13,16 +13,27 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include "lib/Pins.h"
-#include "lib/minimized/TinyUart.h"
+#include "lib/minimized/TinyUSART.h"
 
 void loop() {
-	UART_tx_str("Buenos Dias\n");
+/*	GOAL
+
+    1. UART send something like "use this wifi, etc etc"
+    2. Loop:
+        a. Download something like "datadeer.net/s?u={12 character code or somethin}"
+        b. Recieve back and parse
+
+ */
+//	USART0_Transmit( 'X' );
+//	USART0_Transmit( USART0_Receive() );
+//	USART0_Transmit( '\n' );
+	USART0_TX_str("Buenos Dias\n");
 	_delay_ms(1000);
 }
 
 int main() {
-	UART_init();
-	UART_tx_str("START\n");
+	USART0_Init();
+//	UART_tx_str("START\n");
 	while (1) loop();
 	return 0;
 }

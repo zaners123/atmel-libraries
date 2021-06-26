@@ -52,18 +52,6 @@ void UART_tx_uint8(uint8_t number, int radix = 10){
 	UART_tx_str(buffer);
 }
 
-/*void UART_tx_int(int number, int radix = 10){
-	static char buffer[sizeof(int)*8+1];
-	utoa(number,buffer,radix);
-	UART_tx_str(buffer);
-}
-
-void UART_tx_ul(unsigned long number, int radix = 10){
-	static char buffer[sizeof(unsigned long int)*8+1];
-	ultoa(number,buffer,radix);
-	UART_tx_str(buffer);
-}*/
-
 void UART_init(){
 	//set TX pin as output
 	TX_DDR |= (1<<TX_DDR_PIN);
@@ -82,7 +70,6 @@ void UART_init(){
 	/*NOTE: since the internal 8MHz oscillator is not very accurate, this value can be tuned
 	  to achieve the desired baud rate, so if it doesn't work with the nominal value (103), try
 	  increasing or decreasing the value by 1 or 2 */
-
 
 	//OCR0A = F_CPU /(Baud * 8)
 	OCR0A = 12;
