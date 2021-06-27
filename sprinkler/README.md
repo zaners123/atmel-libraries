@@ -19,6 +19,10 @@ cat /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0
 echo -ne 'AT\r\n' > /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0
 ```
 
+# ESP8266 useful commands
+
+AT+UART_CUR sets current UART info such as a new baud rate
+
 # FTDI232
 
 DTR
