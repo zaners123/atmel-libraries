@@ -2,11 +2,11 @@ FILENAME   = main
 
 FILEA = main.cpp
 
-PORT       = /dev/ttyACM0
+PORT       = /dev/serial/by-id/usb-Arduino__www.arduino.cc__0042_95635333331351F011E1-if00
 DEVICE     = attiny4313
 PROGRAMMER = arduino
 BAUD       = 19200
-COMPILE    = avr-g++ -Wall -Os -s -fdata-sections -ffunction-sections -mmcu=$(DEVICE) -Wl,--gc-sections
+COMPILE    = avr-gcc -Wall -Os -s -fdata-sections -ffunction-sections -mmcu=$(DEVICE) -Wl,--gc-sections
 
 default: compile upload clean
 all: compile
@@ -21,7 +21,7 @@ verifyconnection:
 	avrdude -p $(DEVICE) -c $(PROGRAMMER) -P $(PORT) -b $(BAUD)
 
 upload:
-	avrdude -p $(DEVICE) -c $(PROGRAMMER) -P $(PORT) -b $(BAUD) -U flash:w:$(FILENAME).hex:i
+	avrdude -e -p $(DEVICE) -c $(PROGRAMMER) -P $(PORT) -b $(BAUD) -U flash:w:$(FILENAME).hex:i
 clean:
 	rm $(FILEA).o
 	rm $(FILENAME).elf
