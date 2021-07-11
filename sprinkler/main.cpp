@@ -57,41 +57,38 @@ const unsigned char* requestStations() {
 	return ret;
 }
 
+void setRelay(uint8_t number, bool enable) {
+
+}
+/**
+ * The sprinkler, on loop does this:
+ *  1. HTTP GETs to datadeer.net to get every sprinkler state:
+ *      a. If it can't connect 10 times in a row it turns off all lines.
+ *      b. If it recieves the sprinkler states, it sets that on the lines.
+ * */
 void loop() {
 
-	//test connection
-	int errorsInARow = 0;
-
-	const char R[]  = "AT\r\n";
-	const char Y[] PROGMEM = "LOG+YAYIGOTAOK\r\n";
-	const char N[] PROGMEM = "LOG+NOIGOTNOOK\r\n";
-	const unsigned char* T =(const unsigned char*)"LOGGYTEST";
-	USART0_TX_ustr(T);
-
-	/*const unsigned char* stations = requestStations();
-//	const unsigned char CIPCLOSE[] PROGMEM                  = "AT+CIPCLOSE\r\n";
-//	const unsigned char MESSAGE_STAT[] PROGMEM              = "=STAT\r\n";
-//	const unsigned char MESSAGE_LOST_CONNECTION[] PROGMEM   = "NOCONN\r\n";
-//	const unsigned char MESSAGE_INVALID[] PROGMEM           = "INV\r\n";
+	static int errorsInARow = 0;
+	const unsigned char* stations = requestStations();
 
 	if (stations) {
 		errorsInARow = 0;
-		USART0_TX_str(stations);
+		USART0_TX_ustr(stations);
 		USART0_TX_str_pgm(MESSAGE_STAT);
 		for (int i=0;i<NUM_STATIONS;i++) {
-			if (stations[i]=='1') {
-				//set relay i true
-			} else {
-				//set relay i false
-			}
+			setRelay(i,stations[i]=='1');
 		}
 	} else {
 		errorsInARow++;
-		USART0_TX_str_pgm(MESSAGE_INVALID);
-		if (errorsInARow > 10) {
+		if (errorsInARow < 10) {
+			USART0_TX_str_pgm(MESSAGE_INVALID);
+		} else {
 			USART0_TX_str_pgm(MESSAGE_LOST_CONNECTION);
+			for (int i=0;i<NUM_STATIONS;i++) {
+				setRelay(i,false);
+			}
 		}
-	}*/
+	}
 
 	/*It is automatically closed by the server, but you might as well be extra-sure.
 	 * This returns error if it's already closed, so don't bother checking if it returns an error

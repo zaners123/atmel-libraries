@@ -82,7 +82,6 @@ PGM_P const string_table[] PROGMEM = {
 		string_6,
 };
 void USART0_TX_str_pgm(const uint8_t id){
-	int loc=0;
 	char buffer[65];
 	strcpy_P(buffer, (PGM_P)pgm_read_word(&(string_table[id])));
 	USART0_TX_str(buffer);
