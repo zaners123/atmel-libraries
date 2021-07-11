@@ -23,6 +23,8 @@ min = 100; time = 2;
 
 stty -F /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AG0K0CV6-if00-port0 115200 -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
 
+stty -F /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0 9600 -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
+
 # 2. Run these
 cat /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AG0K0CV6-if00-port0 
 printf "AT\r\n" > /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AG0K0CV6-if00-port0

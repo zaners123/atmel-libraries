@@ -1,21 +1,22 @@
 #define F_CPU 1000000UL
 
+#include <avr/pgmspace.h>
+#include <avr/wdt.h>
+#include <avr/builtins.h>
 #include <avr/eeprom.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
-//#include <avr/pgmspace.h>
 #include <avr/sleep.h>
-//#include <avr/wdt.h>
-//#include <avr/builtins.h>
 #include <stdint.h>
-//#include "string.h"
-
-#include <util/delay.h>
 #include <stdlib.h>
+#include <util/delay.h>
 #include <avr/pgmspace.h>
 #include "lib/Pins.h"
 #include "lib/minimized/TinyUSART.h"
 #define NUM_STATIONS 8
+
+//NOTE: Use PSTR to force strings into ROM (4KB) instead of RAM (512 bytes)
+#define nullptr 0
 
 Pin UC_RELAY[NUM_STATIONS] = {
 	Pin(D,2),//1
@@ -28,63 +29,75 @@ Pin UC_RELAY[NUM_STATIONS] = {
 	Pin(B,0),//8
 };
 
-//Set to true after connecting to WIFI and stuff. Set to false on any ERRORs or timeouts
-bool initialized = false;
-
-//Do something like:
-// #define WIFI_CREDS "AT+CWJAP=\"host\",\"pass\""
-
 /**
- * Sends web request, gets result, parses result into list of sprinkler heads to set
- *
+ * Sends web request, gets result, parses result into list of sprinkler heads to set.
+ * @returns char[NUM_STATIONS] either containing 0 or 1
  * */
-const char* requestStations() {
-	//TODO move to startup; only run on errors to reset
+const unsigned char* requestStations() {
+//	const unsigned char CIPSTART[] PROGMEM  = "AT+CIPSTART=\"TCP\",\"73.140.213.122\",51919\r\n";
+//	const unsigned char CIPSEND[] PROGMEM   = "AT+CIPSEND=61\r\n";*//*Change the bytes if you change the GET string*//*
+//	const unsigned char CIPDATA[] PROGMEM   = "GET /?c=123123123123 HTTP/1.1\r\nHost: datadeer.net:51919\r\n\r\n\r\n";
 
-
-	const char* webrequest = "AT+SOMETHING http://datadeer.net:51919/?c=123123123123\r\n";
-	USART0_TX_str(webrequest);//todo
-	char* bracket_data = USART0_RX_bracket();
-	USART0_TX_str(bracket_data);
-	const char* tmp = "00001111";
-	return tmp;
-}
-/**
- * TODO it is obviously mission critical that you
- *   SHUT OFF sprinklers if connection is lost (EX: for over 10 seconds)
- *   1. Get Wifi chip all set up:
- *          a. Might have to verify this, but looks like all setup is done in DEF variables
- * 	        b. UART send something like "use this wifi, etc etc" and get back "OK" every time
- * 	    2. Loop:
- * 	        a. Download something like "datadeer.net/s?u={12 character code or somethin}"
- * 	        b. Recieve back and use USAR0_RX_bracket() to parse out which valves should be open
- *
- * */
-void loop() {
-	//NOTE: Use PSTR to force strings into ROM (4KB) instead of RAM (512 bytes)
-	USART0_TX_str(PSTR("AT+SOMETHING http://73.140.213.122:51919/?c=123123123123"));
-
-	expectOk("AT\r\n");
-
-	/*	GOAL
-	     */
-	const char* stations = requestStations();
-	for (int i=0;i<NUM_STATIONS;i++) {
-		if (stations[i]=='\0') {
-			USART0_TX_str("V Invalid Bracketstr\n");
-			USART0_TX_str(stations);
-			USART0_TX_str("^ Invalid Bracketstr\n");
-		}
-		if (stations[i]=='0') {
-			USART0_TX_str("Station ");
-			USART0_Transmit('0'+i);
-			USART0_TX_str(" off\n");
-		} else if (stations[i]=='1') {
-			USART0_TX_str("Station ");
-			USART0_Transmit('0'+i);
-			USART0_TX_str(" on\n");
+	//Start connection, return nullptr if you can't start connection
+	if (
+		!expectOk(CIPSTART) ||
+		!expectOk(CIPSEND)
+		) {
+		return nullptr;
+	}
+	USART0_TX_str_pgm(CIPDATA);
+	unsigned char* ret = USART0_RX_bracket();
+	//verify output and return
+	for (uint8_t i=0;i<NUM_STATIONS;i++) {
+		if (ret[i]=='\0' || (ret[i]!='0' && ret[i]!='1')) {
+			return nullptr;
 		}
 	}
+	ret[NUM_STATIONS] = '\0';
+	return ret;
+}
+
+void loop() {
+
+	//test connection
+	int errorsInARow = 0;
+
+	const char R[]  = "AT\r\n";
+	const char Y[] PROGMEM = "LOG+YAYIGOTAOK\r\n";
+	const char N[] PROGMEM = "LOG+NOIGOTNOOK\r\n";
+	const unsigned char* T =(const unsigned char*)"LOGGYTEST";
+	USART0_TX_ustr(T);
+
+	/*const unsigned char* stations = requestStations();
+//	const unsigned char CIPCLOSE[] PROGMEM                  = "AT+CIPCLOSE\r\n";
+//	const unsigned char MESSAGE_STAT[] PROGMEM              = "=STAT\r\n";
+//	const unsigned char MESSAGE_LOST_CONNECTION[] PROGMEM   = "NOCONN\r\n";
+//	const unsigned char MESSAGE_INVALID[] PROGMEM           = "INV\r\n";
+
+	if (stations) {
+		errorsInARow = 0;
+		USART0_TX_str(stations);
+		USART0_TX_str_pgm(MESSAGE_STAT);
+		for (int i=0;i<NUM_STATIONS;i++) {
+			if (stations[i]=='1') {
+				//set relay i true
+			} else {
+				//set relay i false
+			}
+		}
+	} else {
+		errorsInARow++;
+		USART0_TX_str_pgm(MESSAGE_INVALID);
+		if (errorsInARow > 10) {
+			USART0_TX_str_pgm(MESSAGE_LOST_CONNECTION);
+		}
+	}*/
+
+	/*It is automatically closed by the server, but you might as well be extra-sure.
+	 * This returns error if it's already closed, so don't bother checking if it returns an error
+	 */
+	USART0_TX_str_pgm(CIPCLOSE);
+
 	_delay_ms(5000);
 }
 

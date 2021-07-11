@@ -9,7 +9,7 @@
 //#define UBRR 25 // (1000000/8/4800)−1
 #define UBRR 12 // (1000000/8/9600)−1
 
-#define RX_TIMEOUT 100000
+#define RX_TIMEOUT (long)750000 // about 5 seconds
 
 /* Initialize UART */
 void USART0_Init() {
@@ -32,18 +32,66 @@ void USART0_Init() {
 bool rxTimedOut;
 unsigned char USART0_Receive() {
 	/* Wait for incoming data */
-	//todo if this loops over x times, set stillRecieve to false
-	static int timeout = RX_TIMEOUT;
-	while ( !(UCSRA & (1<<RXC)) && (timeout-->0));
-	/* Return the data */
+	//todo if this loops over x times, set stillReceive to false
+	long timeout = RX_TIMEOUT;
+	while ( !(UCSRA & (1<<RXC)) && (0 <-- timeout));
+	rxTimedOut = timeout==0;
+	/* Return the UART data*/
 	return UDR;
 }
-#define BUFSIZE 32 // Entire chip has only 256 bytes of RAM
-char rx_buffer[BUFSIZE];
-unsigned char buffer_index;
+void USART0_Transmit(unsigned char data) {
+	/* Wait for empty transmit buffer */
+	while ( !(UCSRA & (1<<UDRE)) );
+	/* Start transmission */
+	UDR = data;
+}
+void USART0_TX_str(const char* string){
+	//until null char
+	while(*string){
+		USART0_Transmit( *string++ );
+	}
+}
+void USART0_TX_ustr(const unsigned char* string){
+	//until null char
+	while(*string){
+		USART0_Transmit( *string++ );
+	}
+}
 
-char* USART0_RX_bracket() {
-	buffer_index = 0;
+#define CIPSTART 0
+const char string_0[] PROGMEM = "AT+CIPSTART=\"TCP\",\"73.140.213.122\",51919\r\n";
+#define CIPSEND 1
+const char string_1[] PROGMEM = "AT+CIPSEND=61\r\n";
+#define CIPDATA 2
+const char string_2[] PROGMEM = "GET /?c=123123123123 HTTP/1.1\r\nHost: datadeer.net:51919\r\n\r\n\r\n";
+#define CIPCLOSE 3
+const char string_3[] PROGMEM = "AT+CIPCLOSE\r\n";
+#define MESSAGE_STAT 4
+const char string_4[] PROGMEM = "=STAT\r\n";
+#define MESSAGE_LOST_CONNECTION 5
+const char string_5[] PROGMEM = "NOCONN\r\n";
+#define MESSAGE_INVALID 6
+const char string_6[] PROGMEM = "INV\r\n";
+PGM_P const string_table[] PROGMEM = {
+		string_0,
+		string_1,
+		string_2,
+		string_3,
+		string_4,
+		string_5,
+		string_6,
+};
+void USART0_TX_str_pgm(const uint8_t id){
+	int loc=0;
+	char buffer[65];
+	strcpy_P(buffer, (PGM_P)pgm_read_word(&(string_table[id])));
+	USART0_TX_str(buffer);
+}
+
+#define BUFSIZE 12 // Entire chip has only 256 bytes of RAM
+unsigned char rx_buffer[BUFSIZE];
+unsigned char* USART0_RX_bracket() {
+	unsigned char buffer_index = 0;
 	rxTimedOut = false;
 	//find starter quote
 	while(!rxTimedOut && USART0_Receive() != '{');
@@ -59,24 +107,35 @@ char* USART0_RX_bracket() {
 	return rx_buffer;
 }
 
-void USART0_Transmit(unsigned char data) {
-	/* Wait for empty transmit buffer */
-	while ( !(UCSRA & (1<<UDRE)) );
-	/* Start transmittion */
-	UDR = data;
-}
-void USART0_TX_str(const char* string){
-	//until null char
-	while(*string){
-		USART0_Transmit( *string++ );
-	}
-}
-
 /**
- * Send request over UART. Expect either OK or ERROR.
- *  If it receives OK, return true
- *  If it recieves ERROR or times out, return false
+ * Sends specified request over UART. Then reads uart until either "OK\r\n", "ERROR\r\n", or a timeout.
+ *  If it receives "OK\r\n", return true
+ *  If it receives "ERROR\r\n" or a timeout, return false
  */
-bool expectOk(const char* command) {
-	USART0_TX_str("AT\r\n");
+bool expectOk(uint8_t command) {
+	USART0_TX_str_pgm(command);
+	static unsigned char lastChars[8];//circular buffer
+	uint8_t cbIndex = 0;
+	while (true) {
+		lastChars[cbIndex%8] = USART0_Receive();
+		if (rxTimedOut) return false;
+		if (lastChars[(cbIndex+7)%8]=='\r' && lastChars[(cbIndex+0)%8]=='\n' && lastChars[(cbIndex+5)%8]=='O') {
+			//test if last 4 characters are "OK\r\n" and if so return true
+			if (
+					lastChars[(cbIndex+6)%8]=='K'
+					) {
+				return true;
+			}
+			//test if last 7 characters are "ERROR\r\n" and if so return false
+			if (
+					lastChars[(cbIndex+2)%8]=='E' &&
+					lastChars[(cbIndex+3)%8]=='R' &&
+					lastChars[(cbIndex+4)%8]=='R' &&
+					lastChars[(cbIndex+6)%8]=='R'
+					) {
+				return false;
+			}
+		}
+		cbIndex++;
+	}
 }
