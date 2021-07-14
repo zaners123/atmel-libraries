@@ -58,7 +58,7 @@ const unsigned char* requestStations() {
 }
 
 void setRelay(uint8_t number, bool enable) {
-
+	digitalWrite(UC_RELAY[number],enable);
 }
 /**
  * The sprinkler, on loop does this:
@@ -100,6 +100,7 @@ void loop() {
 
 int main() {
 	USART0_Init();
+	for (int i=0;i<NUM_STATIONS;i++) pinMode(UC_RELAY[i],OUTPUT);
 	while (1) loop();
 	return 0;
 }

@@ -1,3 +1,10 @@
+# TODO
+
+ - Solder everything
+ - Install into sprinkler box and wire
+ - Code advanced stuff like rain detectors
+ - Get AVR ICE and use it on stuff like the "ATMEGA808"
+
 # ATTiny4313
 
 For serial:
