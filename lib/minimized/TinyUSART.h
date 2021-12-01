@@ -89,6 +89,9 @@ void USART0_TX_str_pgm(const uint8_t id){
 
 #define BUFSIZE 12 // Entire chip has only 256 bytes of RAM
 unsigned char rx_buffer[BUFSIZE];
+/**
+ * @summary Looking for something like {10000001}
+ * */
 unsigned char* USART0_RX_bracket() {
 	unsigned char buffer_index = 0;
 	rxTimedOut = false;

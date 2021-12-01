@@ -10,4 +10,5 @@ tiny/arduino/
 *.pdf
 *.png
 *.o
+*.hide.*
 

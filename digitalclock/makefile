@@ -2,10 +2,10 @@ FILENAME   = main
 
 FILEA = main.cpp
 
-PORT       = /dev/serial/by-id/usb-Arduino__www.arduino.cc__0042_95635333331351F011E1-if00
-DEVICE     = attiny2313
-PROGRAMMER = arduino
-BAUD       = 19200
+PORT       = /dev/serial/by-id/usb-FTDI_USB_Serial_Converter_FTCGVOD6-if00-port0
+DEVICE     = attiny85
+PROGRAMMER = stk500
+BAUD	   :=
 COMPILE    = avr-gcc -Wall -Os -s -fdata-sections -ffunction-sections -mmcu=$(DEVICE) -Wl,--gc-sections
 
 default: compile upload clean
@@ -18,10 +18,10 @@ compile:
 	avr-size --format=avr --mcu=$(DEVICE) $(FILENAME).elf
 
 verifyconnection:
-	avrdude -p $(DEVICE) -c $(PROGRAMMER) -P $(PORT) -b $(BAUD)
+	avrdude -p $(DEVICE) -c $(PROGRAMMER) -P $(PORT) $(BAUD)
 
 upload:
-	avrdude -e -p $(DEVICE) -c $(PROGRAMMER) -P $(PORT) -b $(BAUD) -U flash:w:$(FILENAME).hex:i
+	avrdude -e -p $(DEVICE) -c $(PROGRAMMER) -P $(PORT) $(BAUD) -U flash:w:$(FILENAME).hex:i
 clean:
 	rm $(FILEA).o
 	rm $(FILENAME).elf

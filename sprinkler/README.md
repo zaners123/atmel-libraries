@@ -28,9 +28,9 @@ min = 100; time = 2;
 -opost -onlcr
 -isig -icanon -echo
 
-stty -F /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AG0K0CV6-if00-port0 115200 -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
+stty -F /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AG0K0CV6-if00-port0 115200 -isig -icanon -echo -opost -onlcr -icrnl -imaxbel min 100 time 2
 
-stty -F /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0 9600 -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
+stty -F /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0 9600 -isig -icanon -echo -opost -onlcr -icrnl -imaxbel min 100 time 2
 
 # 2. Run these
 cat /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AG0K0CV6-if00-port0 
@@ -47,9 +47,9 @@ To initialize the ESP8266, you have to configure it with things such as a baud r
 The default baud rate is 115200, so you initally have to run these at that baud rate, but after setting DEF (default) variables once, they stay set.
 
 ```bash
-printf "AT+UART_DEF=9600,8,1,0,0\r\n" > /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0
 printf "AT+CWMODE_DEF=1\r\n" > /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0
 printf 'AT+CWJAP_DEF="wifiname","wifipassword"\r\n' > /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0
+printf "AT+UART_DEF=9600,8,1,0,0\r\n" > /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A50285BI-if00-port0
 ```
 
 ## To get sprinklers that are on

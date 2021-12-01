@@ -31,7 +31,7 @@ public:
 	volatile uint8_t* port;
 	volatile uint8_t* pin;
 	volatile uint8_t pinNumber;
-	Pin(
+	explicit Pin(
 			volatile uint8_t& ddr,
 			volatile uint8_t& port,
 			volatile uint8_t& pin,
@@ -41,7 +41,7 @@ public:
 		this->pin       =&pin;
 		this->pinNumber =pinNumber;
 	}
-	Pin(PortLetter portLetter, uint8_t pinNumber) {
+	explicit Pin(PortLetter portLetter, uint8_t pinNumber) {
 		switch (portLetter) {
 #ifdef DDRA
 			case A:this->ddr=&DDRA;this->port=&PORTA;this->pin=&PINA;break;
