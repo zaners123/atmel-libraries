@@ -4,9 +4,10 @@
 enum Level {HIGH=true,LOW=false};
 enum BitOrder {LSBFIRST,MSBFIRST};
 enum PinMode {
-	INPUT
-	,OUTPUT
-	,INPUT_PULLUP
+	INPUT,
+	INPUT_PULLUP,
+	OUTPUT,
+	OUTPUT_PULLUP
 };
 enum PortLetter {
 #ifdef DDRA
@@ -75,6 +76,12 @@ void pinMode(Pin pin, PinMode mode) {
 		case OUTPUT:
 			//set as output
 			*pin.ddr |= getPinBIT(pin.pinNumber);
+			break;
+		case OUTPUT_PULLUP:
+			//set as output
+			*pin.ddr  |= getPinBIT(pin.pinNumber);
+			//turn on pullup
+			*pin.port |= getPinBIT(pin.pinNumber);
 			break;
 		case INPUT:
 			//set as input

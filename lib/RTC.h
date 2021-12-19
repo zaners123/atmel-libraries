@@ -2,7 +2,7 @@
 #define ATMEGA328P_RTC_H
 
 #include "Pins.h"
-#include "NativeUart.h"
+//#include "NativeUart.h"
 
 #define BURST_BYTES 8
 
@@ -10,11 +10,15 @@
 
 #define byte uint8_t
 
+#define RTC_ADDR_READ_SECOND 0x81
+#define RTC_ADDR_READ_MINUTE 0x83
+#define RTC_ADDR_READ_HOUR   0x85
+
 class RTC {
 
 	Pin SCLK;//"CLK"
 	Pin IO;//"DAT"
-	Pin CE;//"RST"
+	Pin CE;//"~RST" aka Chip Enable
 
 public:
 	RTC(Pin sclk, Pin io, Pin ce): SCLK(sclk),IO(io),CE(ce) {
@@ -175,17 +179,17 @@ public:
 	}*/
 	/*RETRIEVAL FUNCTIONS********************/
 	byte getSecond() {
-		byte read = rtcRead(0x81);
+		byte read = rtcRead(RTC_ADDR_READ_SECOND);
 		return read%16 + (read>>4)*10;
 	}
 
 	byte getMinute() {
-		byte read = rtcRead(0x83);
+		byte read = rtcRead(RTC_ADDR_READ_MINUTE);
 		return read%16 + (read>>4)*10;
 	}
 
 	byte getHour() {
-		byte read = rtcRead(0x85);
+		byte read = rtcRead(RTC_ADDR_READ_HOUR);
 		return read%16 + (read>>4)*10;
 	}
 };

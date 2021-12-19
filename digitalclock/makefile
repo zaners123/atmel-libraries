@@ -3,6 +3,7 @@ FILENAME   = main
 FILEA = main.cpp
 
 PORT       = /dev/serial/by-id/usb-FTDI_USB_Serial_Converter_FTCGVOD6-if00-port0
+#PORT       = /dev/ttyUSB2
 DEVICE     = attiny85
 PROGRAMMER = stk500
 BAUD	   :=
